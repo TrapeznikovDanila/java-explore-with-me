@@ -17,15 +17,32 @@ public class BaseClient {
     }
 
     protected ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
+        return makeAndSendRequestWithoutBody(HttpMethod.GET, path, parameters);
     }
 
     protected <T> ResponseEntity<Object> post(String path, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, null, body);
+        return makeAndSendRequestWithBody(HttpMethod.POST, path, null, body);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                          @Nullable Map<String, Object> parameters, T body) {
+    private <T> ResponseEntity<Object> makeAndSendRequestWithoutBody(HttpMethod method, String path,
+                                                          @Nullable Map<String, Object> parameters) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(null);
+
+        ResponseEntity<Object> exploreWithMeServerResponse;
+        try {
+            if (parameters != null) {
+                exploreWithMeServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+            } else {
+                exploreWithMeServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+            }
+        } catch (HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+        }
+        return prepareGatewayResponse(exploreWithMeServerResponse);
+    }
+
+    private <T> ResponseEntity<Object> makeAndSendRequestWithBody(HttpMethod method, String path,
+                                                                     @Nullable Map<String, Object> parameters, T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body);
 
         ResponseEntity<Object> exploreWithMeServerResponse;
