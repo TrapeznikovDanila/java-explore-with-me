@@ -194,9 +194,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventsByIdFromPrivateController(long userId, long eventId) {
         Event event = getEvent(eventId);
-        if (event.getState() == EventStates.PUBLISHED) {
-            return EventMapper.makeEventFullDto(event);
-        } else if (event.getInitiator().getId() == userId) {
+        if ((event.getState() == EventStates.PUBLISHED) || (event.getInitiator().getId() == userId)) {
             return EventMapper.makeEventFullDto(event);
         }
         return null;
