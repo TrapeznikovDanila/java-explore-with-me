@@ -2,11 +2,13 @@ package ru.practicum.explore_with_me.event;
 
 import lombok.Data;
 import ru.practicum.explore_with_me.category.Category;
+import ru.practicum.explore_with_me.event.comment.Comment;
 import ru.practicum.explore_with_me.user.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -36,6 +38,6 @@ public class Event {
     private EventStates state;
     private String title;
     private long views;
-
-
+    @Transient
+    private List<Comment> comments;
 }

@@ -47,4 +47,9 @@ public class EventsAdminController {
     public EventFullDto updateEvent(@PathVariable long eventId, @RequestBody AdminUpdateEventRequest eventRequest) {
         return service.updateEventByAdmin(eventId, eventRequest);
     }
+
+    @PatchMapping("/{eventId}/comment/{commentId}/reject")
+    public void rejectComment(@PathVariable long eventId, @PathVariable long commentId) {
+        service.rejectComment(eventId, commentId);
+    }
 }

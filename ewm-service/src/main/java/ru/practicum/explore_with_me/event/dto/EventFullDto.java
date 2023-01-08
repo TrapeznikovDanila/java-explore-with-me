@@ -5,10 +5,12 @@ import lombok.Data;
 import ru.practicum.explore_with_me.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.event.EventStates;
 import ru.practicum.explore_with_me.event.Location;
+import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
 import ru.practicum.explore_with_me.user.dto.UserShortDto;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class EventFullDto {
@@ -30,5 +32,5 @@ public class EventFullDto {
     private EventStates state;
     private String title;
     private long views;
-
+    private List<CommentDto> comments;
 }

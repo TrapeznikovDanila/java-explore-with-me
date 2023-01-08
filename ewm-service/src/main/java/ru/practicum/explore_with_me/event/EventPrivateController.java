@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
+import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.event.dto.NewEventDto;
@@ -66,5 +70,17 @@ public class EventPrivateController {
     public ParticipationRequestDto rejectRequest(@PathVariable long userId, @PathVariable long eventId,
                                                  @PathVariable long reqId) {
         return service.rejectRequest(userId, eventId, reqId);
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/comment")
+    public CommentDto saveNewComment(@PathVariable long userId, @PathVariable long eventId,
+                                     @RequestBody @Validated NewCommentDto commentDto) {
+        return service.saveNewComment(userId, eventId, commentDto);
+    }
+
+    @PatchMapping("/{userId}/events/{eventId}/comment")
+    public UpdatedCommentDto updateComment(@PathVariable long userId, @PathVariable long eventId,
+                                           @RequestBody @Validated UpdateCommentRequest updateCommentRequest) {
+        return service.updateComment(userId, eventId, updateCommentRequest);
     }
 }

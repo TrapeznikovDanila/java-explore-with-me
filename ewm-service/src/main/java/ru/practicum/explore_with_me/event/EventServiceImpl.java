@@ -6,6 +6,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore_with_me.category.Category;
 import ru.practicum.explore_with_me.category.CategoryRepository;
+import ru.practicum.explore_with_me.event.comment.Comment;
+import ru.practicum.explore_with_me.event.comment.CommentMapper;
+import ru.practicum.explore_with_me.event.comment.CommentRepository;
+import ru.practicum.explore_with_me.event.comment.CommentStatus;
+import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
+import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 import ru.practicum.explore_with_me.event.dto.*;
 import ru.practicum.explore_with_me.exception.ErrorStatus;
 import ru.practicum.explore_with_me.exception.NotFoundException;
@@ -15,6 +23,7 @@ import ru.practicum.explore_with_me.request.RequestMapper;
 import ru.practicum.explore_with_me.request.RequestRepository;
 import ru.practicum.explore_with_me.request.RequestStates;
 import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
+import ru.practicum.explore_with_me.user.User;
 import ru.practicum.explore_with_me.user.UserRepository;
 
 import java.sql.Timestamp;
@@ -37,6 +46,8 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
 
     private final RequestRepository requestRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public EventFullDto saveNewEvent(long userId, NewEventDto eventDto) {
@@ -90,53 +101,65 @@ public class EventServiceImpl implements EventService {
 
     private List<EventFullDto> getEventsWithoutUsers(List<EventStates> states, List<Long> categories, Timestamp rangeStart,
                                                      Timestamp rangeEnd, Integer from, Integer size) {
-        return repository.findAllWithoutUsers(states, categories, rangeStart, rangeEnd,
+        List<EventFullDto> eventFullDtos = repository.findAllWithoutUsers(states, categories, rangeStart, rangeEnd,
                         PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     private List<EventFullDto> getEventsWithoutCategories(List<Long> users, List<EventStates> states, Timestamp rangeStart,
                                                           Timestamp rangeEnd, Integer from, Integer size) {
-        return repository.findAllWithoutCategories(users, states, rangeStart, rangeEnd,
+        List<EventFullDto> eventFullDtos = repository.findAllWithoutCategories(users, states, rangeStart, rangeEnd,
                         PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     private List<EventFullDto> getEventsWithoutTime(List<Long> users, List<EventStates> states, List<Long> categories,
                                                     Integer from, Integer size) {
-        return repository.findAllWithoutTime(users, states, categories, PageRequest.of(from / size, size))
+        List<EventFullDto> eventFullDtos = repository.findAllWithoutTime(users, states, categories, PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     private List<EventFullDto> getEventsOnlyWithUsersAndStates(List<Long> users, List<EventStates> states, Integer from,
                                                                Integer size) {
-        return repository.findAllOnlyWithUsersAndStates(users, states, PageRequest.of(from / size, size))
+        List<EventFullDto> eventFullDtos = repository.findAllOnlyWithUsersAndStates(users, states, PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     private List<EventFullDto> getEventsOnlyWithCategoriesAndStates(List<EventStates> states, List<Long> categories,
                                                                     Integer from, Integer size) {
-        return repository.findAllOnlyWithCategoriesAndStates(states, categories, PageRequest.of(from / size, size))
+        List<EventFullDto> eventFullDtos = repository.findAllOnlyWithCategoriesAndStates(states, categories, PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     private List<EventFullDto> getEventsOnlyWithTimeAndStates(List<EventStates> states, Timestamp rangeStart,
                                                               Timestamp rangeEnd, Integer from, Integer size) {
-        return repository.findAllOnlyWithTimeAndStates(states, rangeStart, rangeEnd,
+        List<EventFullDto> eventFullDtos = repository.findAllOnlyWithTimeAndStates(states, rangeStart, rangeEnd,
                         PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList());
+
+        return setCommentsForEvents(eventFullDtos);
     }
 
     @Override
@@ -181,11 +204,23 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public void rejectComment(long eventId, long commentId) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+            comment.setStatus(CommentStatus.REJECTED);
+            commentRepository.save(comment);
+        }
+    }
+
+    @Override
     public EventFullDto getEventsByIdFromPublicController(long id) {
         Event event = getEvent(id);
         if (event.getState() == EventStates.PUBLISHED) {
             event.setViews(event.getViews() + 1);
             repository.save(event);
+            List<Comment> comments = commentRepository.findAllByEventId(id);
+            event.setComments(comments);
             return EventMapper.makeEventFullDto(event);
         }
         return null;
@@ -195,6 +230,8 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventsByIdFromPrivateController(long userId, long eventId) {
         Event event = getEvent(eventId);
         if ((event.getState() == EventStates.PUBLISHED) || (event.getInitiator().getId() == userId)) {
+            List<Comment> comments = commentRepository.findAllByEventId(eventId);
+            event.setComments(comments);
             return EventMapper.makeEventFullDto(event);
         }
         return null;
@@ -272,6 +309,59 @@ public class EventServiceImpl implements EventService {
         Request request = getRequest(reqId);
         request.setStatus(RequestStates.REJECTED);
         return RequestMapper.makeRequestDto(requestRepository.save(request));
+    }
+
+    @Override
+    public CommentDto saveNewComment(long userId, long eventId, NewCommentDto commentDto) {
+        Comment comment = CommentMapper.makeComment(commentDto);
+        Optional<Event> eventOptional = repository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            comment.setEventId(eventId);
+        } else {
+            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The event object was not found.",
+                    String.format("Event with id=%s was not found.", eventId),
+                    LocalDateTime.now());
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            comment.setUserId(userId);
+            comment.setAuthorName(userOptional.get().getName());
+        } else {
+            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The user object was not found.",
+                    String.format("User with id=%s was not found.", userId),
+                    LocalDateTime.now());
+        }
+        comment.setCreated(Timestamp.from(Instant.now()));
+        comment.setStatus(CommentStatus.PUBLISHED);
+        return CommentMapper.makeCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public UpdatedCommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest) {
+        Optional<Comment> commentOptional = commentRepository.findById(updateCommentRequest.getId());
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+            if (comment.getUserId() != userId) {
+                throw new ValidationException(null, ErrorStatus.CONFLICT, "You can't change other users comments.",
+                        String.format("Comment with id=%s was left by another user.",
+                                comment.getId()), LocalDateTime.now());
+            }
+            if (comment.getEventId() != eventId) {
+                throw new ValidationException(null, ErrorStatus.CONFLICT, "Wrong event id.",
+                        String.format("Comment with id=%s was left for another event.",
+                                comment.getId()), LocalDateTime.now());
+            }
+            if (comment.getStatus().equals(CommentStatus.REJECTED)) {
+                comment.setStatus(CommentStatus.PUBLISHED);
+            }
+            comment.setText(updateCommentRequest.getText());
+            UpdatedCommentDto updatedCommentDto = CommentMapper.makeUpdatedCommentDto(comment);
+            updatedCommentDto.setUpdated(Timestamp.from(Instant.now()));
+            return updatedCommentDto;
+        }
+        throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
+                String.format("Comment with id=%s was not found.", updateCommentRequest.getId()),
+                LocalDateTime.now());
     }
 
     private Event getEvent(long eventId) {
@@ -408,5 +498,15 @@ public class EventServiceImpl implements EventService {
                         Timestamp.valueOf(LocalDateTime.now()), PageRequest.of(from / size, size)).stream()
                 .map(EventMapper::makeEventShortDto)
                 .collect(Collectors.toList());
+    }
+
+    private List<EventFullDto> setCommentsForEvents(List<EventFullDto> eventFullDtos) {
+        List<Long> eventsIds = eventFullDtos.stream().map(e -> e.getId()).collect(Collectors.toList());
+        List<CommentDto> commentDtos = commentRepository.findAllByIds(eventsIds).stream()
+                .map(CommentMapper::makeCommentDto).collect(Collectors.toList());
+        for (EventFullDto e : eventFullDtos) {
+            e.setComments(commentDtos.stream().filter(c -> c.getEventId() == e.getId()).collect(Collectors.toList()));
+        }
+        return eventFullDtos;
     }
 }

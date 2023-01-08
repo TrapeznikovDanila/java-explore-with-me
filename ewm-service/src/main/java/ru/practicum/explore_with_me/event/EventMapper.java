@@ -2,10 +2,13 @@ package ru.practicum.explore_with_me.event;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.explore_with_me.category.CategoryMapper;
+import ru.practicum.explore_with_me.event.comment.CommentMapper;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.user.UserMapper;
+
+import java.util.stream.Collectors;
 
 @Component
 public class EventMapper {
@@ -42,6 +45,12 @@ public class EventMapper {
         eventFullDto.setState(event.getState());
         eventFullDto.setTitle(event.getTitle());
         eventFullDto.setViews(event.getViews());
+        if (event.getComments() != null) {
+            eventFullDto.setComments(event.getComments().stream()
+                    .map(CommentMapper::makeCommentDto).collect(Collectors.toList()));
+        } else {
+            eventFullDto.setComments(null);
+        }
         return eventFullDto;
     }
 
