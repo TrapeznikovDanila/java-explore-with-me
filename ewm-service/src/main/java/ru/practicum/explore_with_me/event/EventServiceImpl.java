@@ -372,6 +372,7 @@ public class EventServiceImpl implements EventService {
     public List<CommentDto> searchCommentByAuthor(long userId, Timestamp rangeStart, Timestamp rangeEnd,
                                                   List<CommentStatus> statuses, Integer from, Integer size) {
         if (statuses == null) {
+            statuses = new ArrayList<>();
             statuses.add(CommentStatus.REJECTED);
             statuses.add(CommentStatus.PUBLISHED);
         }
@@ -389,6 +390,7 @@ public class EventServiceImpl implements EventService {
     public List<CommentDto> getComments(List<Long> users, List<Long> events, List<CommentStatus> statuses,
                                         Timestamp rangeStart, Timestamp rangeEnd, Integer from, Integer size) {
         if (statuses == null) {
+            statuses = new ArrayList<>();
             statuses.add(CommentStatus.REJECTED);
             statuses.add(CommentStatus.PUBLISHED);
         }
