@@ -230,7 +230,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"text\": \"Интересное событие\"\r\n}",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"rejectionReason\": \"Просто захотелось, я ведь админ\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -238,7 +238,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/admin/events/:eventsId/comment/:commentId/reject",
+					"raw": "{{baseUrl}}/admin/events/:eventsId/comment/reject",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -247,16 +247,11 @@
 						"events",
 						":eventsId",
 						"comment",
-						":commentId",
 						"reject"
 					],
 					"variable": [
 						{
 							"key": "eventsId",
-							"value": "1"
-						},
-						{
-							"key": "commentId",
 							"value": "1"
 						}
 					]

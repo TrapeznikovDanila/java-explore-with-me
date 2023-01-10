@@ -14,4 +14,7 @@ public class CommentDto {
     private String text;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
+    private Timestamp updated;
+    private String rejectionReason;
 }

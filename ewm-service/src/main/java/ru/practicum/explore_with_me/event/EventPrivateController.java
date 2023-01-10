@@ -1,25 +1,27 @@
 package ru.practicum.explore_with_me.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore_with_me.event.comment.CommentStatus;
 import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
 import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
 import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
-import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.event.dto.UpdateEventRequest;
 import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Slf4j
-@Validated
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -74,13 +76,23 @@ public class EventPrivateController {
 
     @PostMapping("/{userId}/events/{eventId}/comment")
     public CommentDto saveNewComment(@PathVariable long userId, @PathVariable long eventId,
-                                     @RequestBody @Validated NewCommentDto commentDto) {
+                                     @RequestBody @Valid NewCommentDto commentDto) {
         return service.saveNewComment(userId, eventId, commentDto);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/comment")
-    public UpdatedCommentDto updateComment(@PathVariable long userId, @PathVariable long eventId,
+    public CommentDto updateComment(@PathVariable long userId, @PathVariable long eventId,
                                            @RequestBody @Validated UpdateCommentRequest updateCommentRequest) {
         return service.updateComment(userId, eventId, updateCommentRequest);
+    }
+
+    @GetMapping("/{userId}/comments")
+    public List<CommentDto> searchCommentByAuthor(@PathVariable long userId,
+                                                  @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeStart,
+                                                  @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeEnd,
+                                                  @RequestParam(required = false) List<CommentStatus> statuses,
+                                                  @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                  @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return service.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses, from, size);
     }
 }

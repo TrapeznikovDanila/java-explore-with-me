@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS comments (
     event_id BIGINT REFERENCES events(id) ON DELETE CASCADE,
     text VARCHAR(500) NOT NULL,
     created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated TIMESTAMP WITHOUT TIME ZONE,
     status VARCHAR(50) NOT NULL,
+    rejection_reason VARCHAR(50),
     CONSTRAINT pk_comments PRIMARY KEY (id)
 );

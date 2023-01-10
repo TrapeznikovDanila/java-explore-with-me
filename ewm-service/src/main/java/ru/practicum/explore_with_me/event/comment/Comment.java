@@ -17,6 +17,8 @@ public class Comment {
     private long eventId;
     private String text;
     private Timestamp created;
+    private Timestamp updated;
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
+    private String rejectionReason;
 }

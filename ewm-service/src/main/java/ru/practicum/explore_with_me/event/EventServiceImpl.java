@@ -12,8 +12,8 @@ import ru.practicum.explore_with_me.event.comment.CommentRepository;
 import ru.practicum.explore_with_me.event.comment.CommentStatus;
 import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
 import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.RejectionCommentRequest;
 import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
-import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 import ru.practicum.explore_with_me.event.dto.*;
 import ru.practicum.explore_with_me.exception.ErrorStatus;
 import ru.practicum.explore_with_me.exception.NotFoundException;
@@ -204,12 +204,17 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void rejectComment(long eventId, long commentId) {
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+    public void rejectComment(long eventId, RejectionCommentRequest commentRequest) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentRequest.getId());
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
             comment.setStatus(CommentStatus.REJECTED);
+            comment.setRejectionReason(commentRequest.getRejectionReason());
             commentRepository.save(comment);
+        } else {
+            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
+                    String.format("Comment with id=%s was not found.", commentRequest.getId()),
+                    LocalDateTime.now());
         }
     }
 
@@ -337,7 +342,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public UpdatedCommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest) {
+    public CommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest) {
         Optional<Comment> commentOptional = commentRepository.findById(updateCommentRequest.getId());
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
@@ -355,13 +360,56 @@ public class EventServiceImpl implements EventService {
                 comment.setStatus(CommentStatus.PUBLISHED);
             }
             comment.setText(updateCommentRequest.getText());
-            UpdatedCommentDto updatedCommentDto = CommentMapper.makeUpdatedCommentDto(comment);
-            updatedCommentDto.setUpdated(Timestamp.from(Instant.now()));
-            return updatedCommentDto;
+            comment.setUpdated(Timestamp.from(Instant.now()));
+            return CommentMapper.makeCommentDto(commentRepository.save(comment));
         }
         throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
                 String.format("Comment with id=%s was not found.", updateCommentRequest.getId()),
                 LocalDateTime.now());
+    }
+
+    @Override
+    public List<CommentDto> searchCommentByAuthor(long userId, Timestamp rangeStart, Timestamp rangeEnd,
+                                                  List<CommentStatus> statuses, Integer from, Integer size) {
+        if (statuses == null) {
+            statuses.add(CommentStatus.REJECTED);
+            statuses.add(CommentStatus.PUBLISHED);
+        }
+        if ((rangeStart == null) || (rangeEnd == null)) {
+            return commentRepository.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses,
+                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                    .collect(Collectors.toList());
+        }
+        return commentRepository.searchCommentByAuthorWithoutTime(userId, statuses,
+                        PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDto> getComments(List<Long> users, List<Long> events, List<CommentStatus> statuses,
+                                        Timestamp rangeStart, Timestamp rangeEnd, Integer from, Integer size) {
+        if (statuses == null) {
+            statuses.add(CommentStatus.REJECTED);
+            statuses.add(CommentStatus.PUBLISHED);
+        }
+        if (rangeStart == null) {
+            rangeStart = Timestamp.from(Instant.ofEpochMilli(0));
+        }
+        if (rangeEnd == null) {
+            rangeEnd = Timestamp.from(Instant.now());
+        }
+        if (users == null) {
+            return commentRepository.searchCommentByAdminWithoutUsers(events, rangeStart, rangeEnd, statuses,
+                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                    .collect(Collectors.toList());
+        } else if (events == null) {
+            return commentRepository.searchCommentByAdminWithoutEvents(users, rangeStart, rangeEnd, statuses,
+                            PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                    .collect(Collectors.toList());
+        }
+        return commentRepository.searchCommentByAdmin(users, events, rangeStart, rangeEnd, statuses,
+                        PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                .collect(Collectors.toList());
     }
 
     private Event getEvent(long eventId) {

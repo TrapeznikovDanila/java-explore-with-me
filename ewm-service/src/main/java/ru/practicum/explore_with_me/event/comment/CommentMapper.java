@@ -3,7 +3,6 @@ package ru.practicum.explore_with_me.event.comment;
 import org.springframework.stereotype.Component;
 import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
 import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
-import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 
 @Component
 public class CommentMapper {
@@ -22,17 +21,12 @@ public class CommentMapper {
         commentDto.setEventId(comment.getEventId());
         commentDto.setText(comment.getText());
         commentDto.setCreated(comment.getCreated());
-        return commentDto;
-    }
-
-    public static UpdatedCommentDto makeUpdatedCommentDto(Comment comment) {
-        UpdatedCommentDto commentDto = new UpdatedCommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setUserId(comment.getUserId());
-        commentDto.setAuthorName(comment.getAuthorName());
-        commentDto.setEventId(comment.getEventId());
-        commentDto.setText(comment.getText());
-        commentDto.setCreated(comment.getCreated());
+        if (comment.getUpdated() != null) {
+            commentDto.setUpdated(comment.getUpdated());
+        }
+        if (comment.getRejectionReason() != null) {
+            commentDto.setRejectionReason(comment.getRejectionReason());
+        }
         return commentDto;
     }
 }

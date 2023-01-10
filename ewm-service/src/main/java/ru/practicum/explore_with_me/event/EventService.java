@@ -1,9 +1,10 @@
 package ru.practicum.explore_with_me.event;
 
+import ru.practicum.explore_with_me.event.comment.CommentStatus;
 import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
 import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.RejectionCommentRequest;
 import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
-import ru.practicum.explore_with_me.event.comment.dto.UpdatedCommentDto;
 import ru.practicum.explore_with_me.event.dto.*;
 import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
 
@@ -26,7 +27,7 @@ public interface EventService {
 
     EventFullDto rejectEvent(long eventId);
 
-    void rejectComment(long eventId, long commentId);
+    void rejectComment(long eventId, RejectionCommentRequest commentRequest);
 
     EventFullDto getEventsByIdFromPublicController(long id);
 
@@ -46,5 +47,11 @@ public interface EventService {
 
     CommentDto saveNewComment(long userId, long eventId, NewCommentDto commentDto);
 
-    UpdatedCommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest);
+    CommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest);
+
+    List<CommentDto> searchCommentByAuthor(long userId, Timestamp rangeStart, Timestamp rangeEnd, List<CommentStatus> statuses,
+                          Integer from, Integer size);
+
+    List<CommentDto> getComments(List<Long> users, List<Long> events, List<CommentStatus> statuses, Timestamp rangeStart, Timestamp rangeEnd,
+                                 Integer from, Integer size);
 }

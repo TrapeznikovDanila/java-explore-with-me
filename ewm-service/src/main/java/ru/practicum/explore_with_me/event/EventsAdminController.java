@@ -5,9 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore_with_me.event.comment.CommentStatus;
+import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.RejectionCommentRequest;
 import ru.practicum.explore_with_me.event.dto.AdminUpdateEventRequest;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;
@@ -48,8 +52,19 @@ public class EventsAdminController {
         return service.updateEventByAdmin(eventId, eventRequest);
     }
 
-    @PatchMapping("/{eventId}/comment/{commentId}/reject")
-    public void rejectComment(@PathVariable long eventId, @PathVariable long commentId) {
-        service.rejectComment(eventId, commentId);
+    @PatchMapping("/{eventId}/comment/reject")
+    public void rejectComment(@PathVariable long eventId, @RequestBody @Valid RejectionCommentRequest commentRequest) {
+        service.rejectComment(eventId, commentRequest);
+    }
+
+    @GetMapping("/comments")
+    public List<CommentDto> getComments(@RequestParam(required = false) List<Long> users,
+                                        @RequestParam(required = false) List<Long> events,
+                                        @RequestParam(required = false) List<CommentStatus> statuses,
+                                        @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeStart,
+                                        @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeEnd,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return service.getComments(users, events, statuses, rangeStart, rangeEnd, from, size);
     }
 }
