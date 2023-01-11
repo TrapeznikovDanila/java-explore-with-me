@@ -28,7 +28,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
 
     @Override
-    public ParticipationRequestDto saveNewRequest(long userId, long eventId) {
+    public ParticipationRequestDto saveNewRequest(Long userId, Long eventId) {
         Request request = new Request();
         request.setCreated(Timestamp.from(Instant.now()));
         request.setStatus(RequestStates.PENDING);
@@ -38,13 +38,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getRequestByUserId(long userId) {
+    public List<ParticipationRequestDto> getRequestByUserId(Long userId) {
         return repository.findAllByRequester_Id(userId).stream().map(RequestMapper::makeRequestDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ParticipationRequestDto canceledRequestByRequester(long userId, long requestId) {
+    public ParticipationRequestDto canceledRequestByRequester(Long userId, Long requestId) {
         Optional<Request> requestOptional = repository.findById(requestId);
         if (requestOptional.isPresent()) {
             Request request = requestOptional.get();
@@ -61,7 +61,7 @@ public class RequestServiceImpl implements RequestService {
                 LocalDateTime.now());
     }
 
-    private void setRequester(Request request, long userId) {
+    private void setRequester(Request request, Long userId) {
         Optional<User> requesterOptional = userRepository.findById(userId);
         if (requesterOptional.isPresent()) {
             request.setRequester(requesterOptional.get());
@@ -72,7 +72,7 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    private void setEvent(Request request, long eventId) {
+    private void setEvent(Request request, Long eventId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isPresent()) {
             request.setEvent(eventOptional.get());

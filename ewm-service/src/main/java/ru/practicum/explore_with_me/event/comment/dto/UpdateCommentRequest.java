@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateCommentRequest {
     @NotNull
-    private long id;
+    private Long id;
     @NotBlank
     private String text;
 }

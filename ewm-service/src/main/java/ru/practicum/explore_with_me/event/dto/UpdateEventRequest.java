@@ -13,7 +13,7 @@ public class UpdateEventRequest {
     @Size(max = 7000, min = 20)
     private String description;
     @NotNull
-    private long eventId;
+    private Long eventId;
     private Boolean paid;
     private Integer participantLimit;
     @Size(max = 120, min = 3)

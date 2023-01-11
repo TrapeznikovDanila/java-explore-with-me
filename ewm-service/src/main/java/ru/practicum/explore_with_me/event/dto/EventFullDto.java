@@ -21,7 +21,7 @@ public class EventFullDto {
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp eventDate;
-    private long id;
+    private Long id;
     private UserShortDto initiator;
     private Location location;
     private boolean paid;

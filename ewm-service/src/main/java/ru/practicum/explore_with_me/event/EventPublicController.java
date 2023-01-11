@@ -48,7 +48,7 @@ public class EventPublicController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventsById(@PathVariable long id, HttpServletRequest request) {
+    public EventFullDto getEventsById(@PathVariable Long id, HttpServletRequest request) {
         EndpointHitDto endpointHitDto = new EndpointHitDto();
         endpointHitDto.setIp(request.getRemoteAddr());
         endpointHitDto.setUri("/events/" + id);

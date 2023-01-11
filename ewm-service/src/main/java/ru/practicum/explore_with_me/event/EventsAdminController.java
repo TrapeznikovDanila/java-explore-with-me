@@ -38,22 +38,22 @@ public class EventsAdminController {
     }
 
     @PatchMapping("/{eventId}/publish")
-    public EventFullDto publishEvent(@PathVariable long eventId) {
+    public EventFullDto publishEvent(@PathVariable Long eventId) {
         return service.publishEvent(eventId);
     }
 
     @PatchMapping("/{eventId}/reject")
-    public EventFullDto rejectEvent(@PathVariable long eventId) {
+    public EventFullDto rejectEvent(@PathVariable Long eventId) {
         return service.rejectEvent(eventId);
     }
 
     @PutMapping("/{eventId}")
-    public EventFullDto updateEvent(@PathVariable long eventId, @RequestBody AdminUpdateEventRequest eventRequest) {
+    public EventFullDto updateEvent(@PathVariable Long eventId, @RequestBody AdminUpdateEventRequest eventRequest) {
         return service.updateEventByAdmin(eventId, eventRequest);
     }
 
     @PatchMapping("/{eventId}/comment/reject")
-    public void rejectComment(@PathVariable long eventId, @RequestBody @Valid RejectionCommentRequest commentRequest) {
+    public void rejectComment(@PathVariable Long eventId, @RequestBody @Valid RejectionCommentRequest commentRequest) {
         service.rejectComment(eventId, commentRequest);
     }
 

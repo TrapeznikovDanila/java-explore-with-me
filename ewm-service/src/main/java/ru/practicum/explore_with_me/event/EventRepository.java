@@ -44,7 +44,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e")
     Page<Event> findAll(Pageable pageable);
 
-    Page<Event> findAllByInitiator_Id(long initiatorId, Pageable pageable);
+    Page<Event> findAllByInitiator_Id(Long initiatorId, Pageable pageable);
 
     @Query("select e from Event e where e.annotation like :pattern or e.description like :pattern and e.category.id in :categories" +
             " and e.eventDate between :rangeStart and :rangeEnd and e.paid = :paid and e.publishedOn > :now order by e.eventDate")

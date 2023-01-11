@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotNull
     private Timestamp created;
     @ManyToOne

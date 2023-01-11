@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface EventService {
-    EventFullDto saveNewEvent(long userId, NewEventDto eventDto);
+    EventFullDto saveNewEvent(Long userId, NewEventDto eventDto);
 
     List<EventFullDto> getEvents(List<Long> users, List<EventStates> states, List<Long> categories, Timestamp rangeStart,
                                  Timestamp rangeEnd, Integer from, Integer size);
@@ -21,35 +21,35 @@ public interface EventService {
                                                       Timestamp rangeEnd, Boolean onlyAvailable, SortVariants sort, Integer from,
                                                       Integer size);
 
-    List<EventShortDto> getEventsByInitiator(long userId, Integer from, Integer size);
+    List<EventShortDto> getEventsByInitiator(Long userId, Integer from, Integer size);
 
-    EventFullDto publishEvent(long eventId);
+    EventFullDto publishEvent(Long eventId);
 
-    EventFullDto rejectEvent(long eventId);
+    EventFullDto rejectEvent(Long eventId);
 
-    void rejectComment(long eventId, RejectionCommentRequest commentRequest);
+    void rejectComment(Long eventId, RejectionCommentRequest commentRequest);
 
-    EventFullDto getEventsByIdFromPublicController(long id);
+    EventFullDto getEventsByIdFromPublicController(Long id);
 
-    EventFullDto getEventsByIdFromPrivateController(long userId, long eventId);
+    EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId);
 
-    EventFullDto updateEventByInitiator(long userId, UpdateEventRequest updateEventRequest);
+    EventFullDto updateEventByInitiator(Long userId, UpdateEventRequest updateEventRequest);
 
-    EventFullDto updateEventByAdmin(long eventId, AdminUpdateEventRequest updateEventRequest);
+    EventFullDto updateEventByAdmin(Long eventId, AdminUpdateEventRequest updateEventRequest);
 
-    EventFullDto rejectedEventByInitiator(long userId, long eventId);
+    EventFullDto rejectedEventByInitiator(Long userId, Long eventId);
 
-    List<ParticipationRequestDto> getRequestsByInitiator(long userId, long eventId);
+    List<ParticipationRequestDto> getRequestsByInitiator(Long userId, Long eventId);
 
-    ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId);
+    ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId);
 
-    ParticipationRequestDto rejectRequest(long userId, long eventId, long reqId);
+    ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId);
 
-    CommentDto saveNewComment(long userId, long eventId, NewCommentDto commentDto);
+    CommentDto saveNewComment(Long userId, Long eventId, NewCommentDto commentDto);
 
-    CommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest);
+    CommentDto updateComment(Long userId, Long eventId, UpdateCommentRequest updateCommentRequest);
 
-    List<CommentDto> searchCommentByAuthor(long userId, Timestamp rangeStart, Timestamp rangeEnd, List<CommentStatus> statuses,
+    List<CommentDto> searchCommentByAuthor(Long userId, Timestamp rangeStart, Timestamp rangeEnd, List<CommentStatus> statuses,
                           Integer from, Integer size);
 
     List<CommentDto> getComments(List<Long> users, List<Long> events, List<CommentStatus> statuses, Timestamp rangeStart, Timestamp rangeEnd,

@@ -5,9 +5,9 @@ import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
 import java.util.List;
 
 public interface RequestService {
-    ParticipationRequestDto saveNewRequest(long userId, long eventId);
+    ParticipationRequestDto saveNewRequest(Long userId, Long eventId);
 
-    List<ParticipationRequestDto> getRequestByUserId(long userId);
+    List<ParticipationRequestDto> getRequestByUserId(Long userId);
 
-    ParticipationRequestDto canceledRequestByRequester(long userId, long requestId);
+    ParticipationRequestDto canceledRequestByRequester(Long userId, Long requestId);
 }

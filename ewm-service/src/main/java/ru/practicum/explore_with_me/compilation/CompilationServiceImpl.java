@@ -46,18 +46,18 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto getCompilationByIdFromPublicController(long compId) {
+    public CompilationDto getCompilationByIdFromPublicController(Long compId) {
         return CompilationMapper.makeCompilationDto(getCompilation(compId));
     }
 
     @Override
-    public void deleteCompilation(long compId) {
+    public void deleteCompilation(Long compId) {
         getCompilation(compId);
         repository.deleteById(compId);
     }
 
     @Override
-    public void deleteEventFromCompilation(long compId, long eventId) {
+    public void deleteEventFromCompilation(Long compId, Long eventId) {
         Compilation compilation = getCompilation(compId);
         List<Long> eventsIds = compilation.getEvents().stream().map(c -> c.getId()).collect(Collectors.toList());
         if (eventsIds.contains(eventId)) {
@@ -73,7 +73,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public void addEventToCollection(long compId, long eventId) {
+    public void addEventToCollection(Long compId, Long eventId) {
         Compilation compilation = getCompilation(compId);
         Event event = getEvent(eventId);
         compilation.getEvents().add(event);
@@ -81,7 +81,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public void unpinnedCompilation(long compId) {
+    public void unpinnedCompilation(Long compId) {
         Compilation compilation = getCompilation(compId);
         if (compilation.isPinned()) {
             compilation.setPinned(false);
@@ -94,7 +94,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public void pinnedCompilation(long compId) {
+    public void pinnedCompilation(Long compId) {
         Compilation compilation = getCompilation(compId);
         if (!compilation.isPinned()) {
             compilation.setPinned(true);
@@ -106,7 +106,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
     }
 
-    private Compilation getCompilation(long compId) {
+    private Compilation getCompilation(Long compId) {
         Optional<Compilation> compilationOptional = repository.findById(compId);
         if (compilationOptional.isPresent()) {
             return compilationOptional.get();
@@ -116,7 +116,7 @@ public class CompilationServiceImpl implements CompilationService {
                 LocalDateTime.now());
     }
 
-    private Event getEvent(long eventId) {
+    private Event getEvent(Long eventId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isPresent()) {
             return eventOptional.get();

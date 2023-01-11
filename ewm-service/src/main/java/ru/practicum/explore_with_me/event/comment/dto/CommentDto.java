@@ -7,10 +7,10 @@ import java.sql.Timestamp;
 
 @Data
 public class CommentDto {
-    private long id;
-    private long userId;
+    private Long id;
+    private Long userId;
     private String authorName;
-    private long eventId;
+    private Long eventId;
     private String text;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp created;

@@ -1,55 +1,17 @@
 package ru.practicum.explore_with_me.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import ru.practicum.explore_with_me.request.RequestStates;
 
 import java.sql.Timestamp;
 
+@Data
 public class ParticipationRequestDto {
-    private long id;
+    private Long id;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp created;
-    private long event;
-    private long requester;
+    private Long event;
+    private Long requester;
     private RequestStates status;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Timestamp getCreated() {
-        return created;
-    }
-
-    public void setCreated(Timestamp created) {
-        this.created = created;
-    }
-
-    public long getEvent() {
-        return event;
-    }
-
-    public void setEvent(long event) {
-        this.event = event;
-    }
-
-    public long getRequester() {
-        return requester;
-    }
-
-    public void setRequester(long requester) {
-        this.requester = requester;
-    }
-
-    public RequestStates getStatus() {
-        return status;
-    }
-
-    public void setStatus(RequestStates status) {
-        this.status = status;
-    }
 }

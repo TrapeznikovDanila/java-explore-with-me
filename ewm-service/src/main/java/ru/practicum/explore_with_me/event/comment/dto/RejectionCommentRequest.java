@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class RejectionCommentRequest {
     @NotNull
-    private long id;
+    private Long id;
     @NotBlank
     private String rejectionReason;
 }

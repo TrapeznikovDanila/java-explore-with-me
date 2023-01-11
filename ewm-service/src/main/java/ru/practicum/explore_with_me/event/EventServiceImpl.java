@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
     private final CommentRepository commentRepository;
 
     @Override
-    public EventFullDto saveNewEvent(long userId, NewEventDto eventDto) {
+    public EventFullDto saveNewEvent(Long userId, NewEventDto eventDto) {
         Boolean paid = eventDto.isPaid();
         if (paid == null) {
             eventDto.setPaid(false);
@@ -163,7 +163,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsByInitiator(long userId, Integer from, Integer size) {
+    public List<EventShortDto> getEventsByInitiator(Long userId, Integer from, Integer size) {
         return repository.findAllByInitiator_Id(userId, PageRequest.of(from / size, size))
                 .stream()
                 .map(EventMapper::makeEventShortDto)
@@ -189,7 +189,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto publishEvent(long eventId) {
+    public EventFullDto publishEvent(Long eventId) {
         Event event = getEvent(eventId);
         event.setState(EventStates.PUBLISHED);
         event.setPublishedOn(Timestamp.from(Instant.now()));
@@ -197,14 +197,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto rejectEvent(long eventId) {
+    public EventFullDto rejectEvent(Long eventId) {
         Event event = getEvent(eventId);
         event.setState(EventStates.CANCELED);
         return EventMapper.makeEventFullDto(repository.save(event));
     }
 
     @Override
-    public void rejectComment(long eventId, RejectionCommentRequest commentRequest) {
+    public void rejectComment(Long eventId, RejectionCommentRequest commentRequest) {
         Optional<Comment> commentOptional = commentRepository.findById(commentRequest.getId());
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
@@ -219,7 +219,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventsByIdFromPublicController(long id) {
+    public EventFullDto getEventsByIdFromPublicController(Long id) {
         Event event = getEvent(id);
         if (event.getState() == EventStates.PUBLISHED) {
             event.setViews(event.getViews() + 1);
@@ -232,7 +232,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventsByIdFromPrivateController(long userId, long eventId) {
+    public EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId) {
         Event event = getEvent(eventId);
         if ((event.getState() == EventStates.PUBLISHED) || (event.getInitiator().getId() == userId)) {
             List<Comment> comments = commentRepository.findAllByEventId(eventId);
@@ -243,7 +243,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventByInitiator(long userId, UpdateEventRequest updateEventRequest) {
+    public EventFullDto updateEventByInitiator(Long userId, UpdateEventRequest updateEventRequest) {
         Event event = getEvent(updateEventRequest.getEventId());
         checkInitiator(userId, event);
         if ((event.getState() == EventStates.CANCELED) || (event.getState() == EventStates.PENDING)) {
@@ -259,14 +259,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventByAdmin(long eventId, AdminUpdateEventRequest updateEventRequest) {
+    public EventFullDto updateEventByAdmin(Long eventId, AdminUpdateEventRequest updateEventRequest) {
         Event event = getEvent(eventId);
         updateEventFieldsFromAdminController(event, updateEventRequest);
         return EventMapper.makeEventFullDto(repository.save(event));
     }
 
     @Override
-    public EventFullDto rejectedEventByInitiator(long userId, long eventId) {
+    public EventFullDto rejectedEventByInitiator(Long userId, Long eventId) {
         Event event = getEvent(eventId);
         checkInitiator(userId, event);
         if (event.getState() == EventStates.PENDING) {
@@ -279,7 +279,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getRequestsByInitiator(long userId, long eventId) {
+    public List<ParticipationRequestDto> getRequestsByInitiator(Long userId, Long eventId) {
         Event event = getEvent(eventId);
         checkInitiator(userId, event);
         return requestRepository.findAllByEvent_Id(eventId).stream().map(RequestMapper::makeRequestDto)
@@ -287,7 +287,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId) {
+    public ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId) {
         Event event = getEvent(eventId);
         checkInitiator(userId, event);
         if ((event.getParticipantLimit() == 0) || !event.isRequestModeration()) {
@@ -308,7 +308,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ParticipationRequestDto rejectRequest(long userId, long eventId, long reqId) {
+    public ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId) {
         Event event = getEvent(eventId);
         checkInitiator(userId, event);
         Request request = getRequest(reqId);
@@ -317,11 +317,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public CommentDto saveNewComment(long userId, long eventId, NewCommentDto commentDto) {
+    public CommentDto saveNewComment(Long userId, Long eventId, NewCommentDto commentDto) {
         Comment comment = CommentMapper.makeComment(commentDto);
         Optional<Event> eventOptional = repository.findById(eventId);
         if (eventOptional.isPresent()) {
-            comment.setEventId(eventId);
+            comment.setEvent(eventOptional.get());
         } else {
             throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The event object was not found.",
                     String.format("Event with id=%s was not found.", eventId),
@@ -329,7 +329,7 @@ public class EventServiceImpl implements EventService {
         }
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
-            comment.setUserId(userId);
+            comment.setUser(userOptional.get());
             comment.setAuthorName(userOptional.get().getName());
         } else {
             throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The user object was not found.",
@@ -342,16 +342,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public CommentDto updateComment(long userId, long eventId, UpdateCommentRequest updateCommentRequest) {
+    public CommentDto updateComment(Long userId, Long eventId, UpdateCommentRequest updateCommentRequest) {
         Optional<Comment> commentOptional = commentRepository.findById(updateCommentRequest.getId());
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
-            if (comment.getUserId() != userId) {
+            if (comment.getUser().getId() != userId) {
                 throw new ValidationException(null, ErrorStatus.CONFLICT, "You can't change other users comments.",
                         String.format("Comment with id=%s was left by another user.",
                                 comment.getId()), LocalDateTime.now());
             }
-            if (comment.getEventId() != eventId) {
+            if (comment.getEvent().getId() != eventId) {
                 throw new ValidationException(null, ErrorStatus.CONFLICT, "Wrong event id.",
                         String.format("Comment with id=%s was left for another event.",
                                 comment.getId()), LocalDateTime.now());
@@ -369,7 +369,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<CommentDto> searchCommentByAuthor(long userId, Timestamp rangeStart, Timestamp rangeEnd,
+    public List<CommentDto> searchCommentByAuthor(Long userId, Timestamp rangeStart, Timestamp rangeEnd,
                                                   List<CommentStatus> statuses, Integer from, Integer size) {
         if (statuses == null) {
             statuses = new ArrayList<>();
@@ -414,7 +414,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    private Event getEvent(long eventId) {
+    private Event getEvent(Long eventId) {
         Optional<Event> eventOptional = repository.findById(eventId);
         if (eventOptional.isPresent()) {
             return eventOptional.get();
@@ -425,7 +425,7 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now());
     }
 
-    private Request getRequest(long reqId) {
+    private Request getRequest(Long reqId) {
         Optional<Request> requestOptional = requestRepository.findById(reqId);
         if (requestOptional.isPresent()) {
             return requestOptional.get();
@@ -446,7 +446,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void checkInitiator(long userId, Event event) {
+    private void checkInitiator(Long userId, Event event) {
         if (event.getInitiator().getId() != userId) {
             throw new ValidationException(null, ErrorStatus.CONFLICT, "The user is not event initiator.",
                     String.format("User with id=%s is not event initiator.", userId),

@@ -14,7 +14,7 @@ public class EventShortDto {
     private int confirmedRequests;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp eventDate;
-    private long id;
+    private Long id;
     private UserShortDto initiator;
     private boolean paid;
     private String title;
