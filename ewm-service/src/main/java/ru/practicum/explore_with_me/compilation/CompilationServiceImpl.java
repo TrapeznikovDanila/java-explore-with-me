@@ -61,7 +61,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = getCompilation(compId);
         List<Long> eventsIds = compilation.getEvents().stream().map(c -> c.getId()).collect(Collectors.toList());
         if (eventsIds.contains(eventId)) {
-            List<Event> events = compilation.getEvents().stream().filter(e -> (e.getId() != eventId))
+            List<Event> events = compilation.getEvents().stream().filter(e -> (!e.getId().equals(eventId)))
                     .collect(Collectors.toList());
             compilation.setEvents(events);
             repository.save(compilation);

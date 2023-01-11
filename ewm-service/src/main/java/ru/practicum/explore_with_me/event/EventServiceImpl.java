@@ -234,7 +234,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId) {
         Event event = getEvent(eventId);
-        if ((event.getState() == EventStates.PUBLISHED) || (event.getInitiator().getId() == userId)) {
+        if ((event.getState() == EventStates.PUBLISHED) || (event.getInitiator().getId().equals(userId))) {
             List<Comment> comments = commentRepository.findAllByEventId(eventId);
             event.setComments(comments);
             return EventMapper.makeEventFullDto(event);
@@ -346,12 +346,12 @@ public class EventServiceImpl implements EventService {
         Optional<Comment> commentOptional = commentRepository.findById(updateCommentRequest.getId());
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
-            if (comment.getUser().getId() != userId) {
+            if (!comment.getUser().getId().equals(userId)) {
                 throw new ValidationException(null, ErrorStatus.CONFLICT, "You can't change other users comments.",
                         String.format("Comment with id=%s was left by another user.",
                                 comment.getId()), LocalDateTime.now());
             }
-            if (comment.getEvent().getId() != eventId) {
+            if (!comment.getEvent().getId().equals(eventId)) {
                 throw new ValidationException(null, ErrorStatus.CONFLICT, "Wrong event id.",
                         String.format("Comment with id=%s was left for another event.",
                                 comment.getId()), LocalDateTime.now());
@@ -447,7 +447,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private void checkInitiator(Long userId, Event event) {
-        if (event.getInitiator().getId() != userId) {
+        if (!event.getInitiator().getId().equals(userId)) {
             throw new ValidationException(null, ErrorStatus.CONFLICT, "The user is not event initiator.",
                     String.format("User with id=%s is not event initiator.", userId),
                     LocalDateTime.now());
@@ -555,7 +555,7 @@ public class EventServiceImpl implements EventService {
         List<CommentDto> commentDtos = commentRepository.findAllByIds(eventsIds).stream()
                 .map(CommentMapper::makeCommentDto).collect(Collectors.toList());
         for (EventFullDto e : eventFullDtos) {
-            e.setComments(commentDtos.stream().filter(c -> c.getEventId() == e.getId()).collect(Collectors.toList()));
+            e.setComments(commentDtos.stream().filter(c -> c.getEventId().equals(e.getId())).collect(Collectors.toList()));
         }
         return eventFullDtos;
     }

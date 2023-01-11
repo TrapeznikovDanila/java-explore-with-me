@@ -48,7 +48,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Request> requestOptional = repository.findById(requestId);
         if (requestOptional.isPresent()) {
             Request request = requestOptional.get();
-            if (request.getRequester().getId() == userId) {
+            if (request.getRequester().getId().equals(userId)) {
                 request.setStatus(RequestStates.CANCELED);
                 return RequestMapper.makeRequestDto(repository.save(request));
             }
