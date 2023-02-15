@@ -13,15 +13,14 @@ import java.util.List;
 
 public interface EventService {
     EventFullDto saveNewEvent(Long userId, NewEventDto eventDto);
+    EventFullDto updateEventByInitiator(Long userId, UpdateEventRequest updateEventRequest);
 
-    List<EventFullDto> getEvents(List<Long> users, List<EventStates> states, List<Long> categories, Timestamp rangeStart,
-                                 Timestamp rangeEnd, Integer from, Integer size);
-
-    List<EventShortDto> getEventsFromPublicController(String text, List<Long> categories, Boolean paid, Timestamp rangeStart,
-                                                      Timestamp rangeEnd, Boolean onlyAvailable, SortVariants sort, Integer from,
-                                                      Integer size);
-
+    EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventRequest);
     List<EventShortDto> getEventsByInitiator(Long userId, Integer from, Integer size);
+
+    List<EventFullDto> getEvents(EventAdminSearch eventSearch);
+
+    List<EventShortDto> getEventsFromPublicController(EventPublicSearch eventSearch);
 
     EventFullDto publishEvent(Long eventId);
 
@@ -32,10 +31,6 @@ public interface EventService {
     EventFullDto getEventsByIdFromPublicController(Long id);
 
     EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId);
-
-    EventFullDto updateEventByInitiator(Long userId, UpdateEventRequest updateEventRequest);
-
-    EventFullDto updateEventByAdmin(Long eventId, AdminUpdateEventRequest updateEventRequest);
 
     EventFullDto rejectedEventByInitiator(Long userId, Long eventId);
 

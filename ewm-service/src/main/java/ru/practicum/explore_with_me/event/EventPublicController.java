@@ -3,10 +3,12 @@ package ru.practicum.explore_with_me.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore_with_me.event.dto.EndpointHitDto;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
+import ru.practicum.explore_with_me.event.dto.EventPublicSearch;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Validated
@@ -37,6 +40,16 @@ public class EventPublicController {
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
                                          HttpServletRequest request) {
+        EventPublicSearch eventSearch = EventPublicSearch.builder()
+                .text(text)
+                .categories((Set<Long>) categories)
+                .paid(paid)
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .onlyAvailable(onlyAvailable)
+                .sort(sort)
+                .pageable(PageRequest.of(from / size, size))
+                .build();
         EndpointHitDto endpointHitDto = new EndpointHitDto();
         endpointHitDto.setIp(request.getRemoteAddr());
         endpointHitDto.setUri("/events");
@@ -44,7 +57,7 @@ public class EventPublicController {
         endpointHitDto.setTimestamp(Timestamp.from(Instant.now()));
         client.saveStats(endpointHitDto);
 
-        return service.getEventsFromPublicController(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return service.getEventsFromPublicController(eventSearch);
     }
 
     @GetMapping("/{id}")

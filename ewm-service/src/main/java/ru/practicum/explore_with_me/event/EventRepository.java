@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -48,24 +49,24 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("select e from Event e where e.annotation like :pattern or e.description like :pattern and e.category.id in :categories" +
             " and e.eventDate between :rangeStart and :rangeEnd and e.paid = :paid and e.publishedOn > :now order by e.eventDate")
-    Page<Event> findAllOrderByEventDate(String pattern, List<Long> categories, Boolean paid, Timestamp rangeStart,
+    Page<Event> findAllOrderByEventDate(String pattern, Set<Long> categories, Boolean paid, Timestamp rangeStart,
                                         Timestamp rangeEnd, Timestamp now, Pageable pageable);
 
     @Query("select e from Event e where e.annotation like :pattern or e.description like :pattern and e.category.id in :categories" +
             " and e.eventDate between :rangeStart and :rangeEnd and e.participantLimit > e.confirmedRequests or e.participantLimit = 0 " +
             "and e.paid = :paid and e.publishedOn > :now order by e.eventDate")
-    Page<Event> findAllOrderByEventDateOnlyAvailable(String pattern, List<Long> categories, Boolean paid, Timestamp rangeStart,
+    Page<Event> findAllOrderByEventDateOnlyAvailable(String pattern, Set<Long> categories, Boolean paid, Timestamp rangeStart,
                                                      Timestamp rangeEnd, LocalDateTime now, Pageable pageable);
 
     @Query("select e from Event e where e.annotation like :pattern or e.description like :pattern and e.category.id in :categories" +
             " and e.eventDate between :rangeStart and :rangeEnd and e.paid = :paid and e.publishedOn > :now order by e.views")
-    Page<Event> findAllOrderByViews(String pattern, List<Long> categories, Boolean paid, Timestamp rangeStart,
+    Page<Event> findAllOrderByViews(String pattern, Set<Long> categories, Boolean paid, Timestamp rangeStart,
                                     Timestamp rangeEnd, Timestamp now, Pageable pageable);
 
     @Query("select e from Event e where e.annotation like :pattern or e.description like :pattern and e.category.id in :categories" +
             " and e.eventDate between :rangeStart and :rangeEnd and e.participantLimit > e.confirmedRequests or e.participantLimit = 0 " +
             "and e.paid = :paid and e.publishedOn > :now order by e.views")
-    Page<Event> findAllOrderByViewsOnlyAvailable(String pattern, List<Long> categories, Boolean paid, Timestamp rangeStart,
+    Page<Event> findAllOrderByViewsOnlyAvailable(String pattern, Set<Long> categories, Boolean paid, Timestamp rangeStart,
                                                  Timestamp rangeEnd, Timestamp now, Pageable pageable);
 
     @Query("select e from Event e where e.id in :ids")
