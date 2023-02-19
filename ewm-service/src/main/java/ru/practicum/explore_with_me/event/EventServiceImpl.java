@@ -114,8 +114,8 @@ public class EventServiceImpl implements EventService {
         eventSearch.setRangeEnd(Optional.ofNullable(eventSearch.getRangeEnd())
                 .orElse(Timestamp.valueOf(LocalDateTime.now().plusYears(100))));
         return setCommentsForEvents(repository.getEventsByAdmin(eventSearch.getUsers(), eventSearch.getStates(),
-                eventSearch.getCategories(), eventSearch.getRangeStart(), eventSearch.getRangeEnd(),
-                eventSearch.getPageable()).stream()
+                        eventSearch.getCategories(), eventSearch.getRangeStart(), eventSearch.getRangeEnd(),
+                        eventSearch.getPageable()).stream()
                 .map(EventMapper::makeEventFullDto)
                 .collect(Collectors.toList()));
     }
@@ -248,6 +248,16 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.makeRequestDto(requestRepository.save(request));
     }
 
+    // Отмена запроса на участие
+    @Override
+    public ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId) {
+        Event event = getEvent(eventId);
+        checkInitiator(userId, event);
+        Request request = getRequest(reqId);
+        request.setStatus(RequestStates.REJECTED);
+        return RequestMapper.makeRequestDto(requestRepository.save(request));
+    }
+
     // Получение инициатором всех запросов на участие в событии
     @Override
     public List<ParticipationRequestDto> getRequestsByEventIdByInitiator(Long userId, Long eventId) {
@@ -312,7 +322,7 @@ public class EventServiceImpl implements EventService {
     private Request getRequest(Long reqId) {
         return requestRepository.findById(reqId)
                 .orElseThrow(() -> new NotFoundException(null, ErrorStatus.NOT_FOUND, "Request was not found.",
-                String.format("Request with id=%s was not found.", reqId), LocalDateTime.now()));
+                        String.format("Request with id=%s was not found.", reqId), LocalDateTime.now()));
     }
 
     // Обновление полей события
@@ -323,30 +333,6 @@ public class EventServiceImpl implements EventService {
         Optional.ofNullable(updateEvent.getPaid()).ifPresent(event::setPaid);
         Optional.ofNullable(updateEvent.getParticipantLimit()).ifPresent(event::setParticipantLimit);
         Optional.ofNullable(updateEvent.getTitle()).ifPresent(event::setTitle);
-    }
-
-    @Override
-    public void rejectComment(Long eventId, RejectionCommentRequest commentRequest) {
-        Optional<Comment> commentOptional = commentRepository.findById(commentRequest.getId());
-        if (commentOptional.isPresent()) {
-            Comment comment = commentOptional.get();
-            comment.setStatus(CommentStatus.REJECTED);
-            comment.setRejectionReason(commentRequest.getRejectionReason());
-            commentRepository.save(comment);
-        } else {
-            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
-                    String.format("Comment with id=%s was not found.", commentRequest.getId()),
-                    LocalDateTime.now());
-        }
-    }
-
-    @Override
-    public ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId) {
-        Event event = getEvent(eventId);
-        checkInitiator(userId, event);
-        Request request = getRequest(reqId);
-        request.setStatus(RequestStates.REJECTED);
-        return RequestMapper.makeRequestDto(requestRepository.save(request));
     }
 
     // Сохранение комментария
@@ -364,31 +350,36 @@ public class EventServiceImpl implements EventService {
         return CommentMapper.makeCommentDto(commentRepository.save(comment));
     }
 
+    // Отмена комментария администратором
+    @Override
+    public void rejectComment(Long eventId, RejectionCommentRequest commentRequest) {
+        Comment comment = getComment(commentRequest.getId());
+        comment.setStatus(CommentStatus.REJECTED);
+        comment.setRejectionReason(commentRequest.getRejectionReason());
+        commentRepository.save(comment);
+        log.info("Comment with id={} was rejected", comment.getId());
+    }
+
     @Override
     public CommentDto updateComment(Long userId, Long eventId, UpdateCommentRequest updateCommentRequest) {
-        Optional<Comment> commentOptional = commentRepository.findById(updateCommentRequest.getId());
-        if (commentOptional.isPresent()) {
-            Comment comment = commentOptional.get();
-            if (!comment.getUser().getId().equals(userId)) {
-                throw new ValidationException(null, ErrorStatus.CONFLICT, "You can't change other users comments.",
-                        String.format("Comment with id=%s was left by another user.",
-                                comment.getId()), LocalDateTime.now());
-            }
-            if (!comment.getEvent().getId().equals(eventId)) {
-                throw new ValidationException(null, ErrorStatus.CONFLICT, "Wrong event id.",
-                        String.format("Comment with id=%s was left for another event.",
-                                comment.getId()), LocalDateTime.now());
-            }
-            if (comment.getStatus().equals(CommentStatus.REJECTED)) {
-                comment.setStatus(CommentStatus.PUBLISHED);
-            }
-            comment.setText(updateCommentRequest.getText());
-            comment.setUpdated(Timestamp.from(Instant.now()));
-            return CommentMapper.makeCommentDto(commentRepository.save(comment));
+        Comment comment = getComment(updateCommentRequest.getId());
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new ValidationException(null, ErrorStatus.CONFLICT, "You can't change other users comments.",
+                    String.format("Comment with id=%s was left by another user.",
+                            comment.getId()), LocalDateTime.now());
         }
-        throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
-                String.format("Comment with id=%s was not found.", updateCommentRequest.getId()),
-                LocalDateTime.now());
+        if (!comment.getEvent().getId().equals(eventId)) {
+            throw new ValidationException(null, ErrorStatus.CONFLICT, "Wrong event id.",
+                    String.format("Comment with id=%s was left for another event.",
+                            comment.getId()), LocalDateTime.now());
+        }
+        if (comment.getStatus().equals(CommentStatus.REJECTED)) {
+            comment.setStatus(CommentStatus.PUBLISHED);
+        }
+        comment.setText(updateCommentRequest.getText());
+        comment.setUpdated(Timestamp.from(Instant.now()));
+        log.info("Comment with id={} has been updated", comment.getId());
+        return CommentMapper.makeCommentDto(commentRepository.save(comment));
     }
 
     @Override
@@ -401,7 +392,7 @@ public class EventServiceImpl implements EventService {
         }
         if ((rangeStart == null) || (rangeEnd == null)) {
             return commentRepository.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses,
-                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                            PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
                     .collect(Collectors.toList());
         }
         return commentRepository.searchCommentByAuthorWithoutTime(userId, statuses,
@@ -425,7 +416,7 @@ public class EventServiceImpl implements EventService {
         }
         if (users == null) {
             return commentRepository.searchCommentByAdminWithoutUsers(events, rangeStart, rangeEnd, statuses,
-                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+                            PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
                     .collect(Collectors.toList());
         } else if (events == null) {
             return commentRepository.searchCommentByAdminWithoutEvents(users, rangeStart, rangeEnd, statuses,
@@ -447,6 +438,13 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    private Comment getComment(long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new NotFoundException(null, ErrorStatus.NOT_FOUND, "The comment object was not found.",
+                        String.format("Comment with id=%s was not found.", commentId),
+                        LocalDateTime.now()));
+    }
+
     private List<EventFullDto> setCommentsForEvents(List<EventFullDto> eventFullDtos) {
         List<Long> eventsIds = eventFullDtos.stream().map(EventFullDto::getId).collect(Collectors.toList());
         List<CommentDto> commentDtos = commentRepository.findAllByIds(eventsIds).stream()
@@ -458,11 +456,9 @@ public class EventServiceImpl implements EventService {
     }
 
     private int setConfirmedRequests(Event event) {
-        return event.getRequests()
+        return (int) event.getRequests()
                 .stream()
                 .filter(r -> r.getStatus().equals(RequestStates.CONFIRMED))
-                .map(Request::getId)
-                .collect(Collectors.toList())
-                .size();
+                .map(Request::getId).count();
     }
 }
