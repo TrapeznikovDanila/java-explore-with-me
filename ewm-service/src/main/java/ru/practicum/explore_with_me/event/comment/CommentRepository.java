@@ -12,6 +12,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT c " +
             "FROM Comment c " +
+            "WHERE c.user.id = :userId " +
+            "AND c.status IN :statuses " +
+            "AND c.created BETWEEN :rangeStart AND :rangeEnd")
+    Page<Comment> findCommentsByAuthor(long userId, List<CommentStatus> statuses, Timestamp rangeStart,
+                                       Timestamp rangeEnd, Pageable pageable);
+
+    @Query("SELECT c " +
+            "FROM Comment c " +
             "WHERE c.event.id IN :eventsIds " +
             "AND c.status = 'PUBLISHED'")
     List<Comment> findAllByIds(Iterable<Long> eventsIds);
@@ -42,7 +50,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "AND c.status IN :statuses " +
             "AND c.created BETWEEN :rangeStart AND :rangeEnd")
     Page<Comment> searchCommentByAdmin(Iterable<Long> users, Iterable<Long> events, Timestamp rangeStart, Timestamp rangeEnd,
-                                        List<CommentStatus> statuses, Pageable pageable);
+                                       List<CommentStatus> statuses, Pageable pageable);
 
     @Query("SELECT c " +
             "FROM Comment c " +
@@ -50,7 +58,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "AND c.status IN :statuses " +
             "AND c.created BETWEEN :rangeStart AND :rangeEnd")
     Page<Comment> searchCommentByAdminWithoutEvents(Iterable<Long> users, Timestamp rangeStart, Timestamp rangeEnd,
-                                        List<CommentStatus> statuses, Pageable pageable);
+                                                    List<CommentStatus> statuses, Pageable pageable);
 
     @Query("SELECT c " +
             "FROM Comment c " +
@@ -58,5 +66,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "AND c.status IN :statuses " +
             "AND c.created BETWEEN :rangeStart AND :rangeEnd")
     Page<Comment> searchCommentByAdminWithoutUsers(Iterable<Long> events, Timestamp rangeStart, Timestamp rangeEnd,
-                                        List<CommentStatus> statuses, Pageable pageable);
+                                                   List<CommentStatus> statuses, Pageable pageable);
 }

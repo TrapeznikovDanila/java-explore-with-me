@@ -360,6 +360,7 @@ public class EventServiceImpl implements EventService {
         log.info("Comment with id={} was rejected", comment.getId());
     }
 
+    // Обновление комментария
     @Override
     public CommentDto updateComment(Long userId, Long eventId, UpdateCommentRequest updateCommentRequest) {
         Comment comment = getComment(updateCommentRequest.getId());
@@ -385,19 +386,24 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<CommentDto> searchCommentByAuthor(Long userId, Timestamp rangeStart, Timestamp rangeEnd,
                                                   List<CommentStatus> statuses, Integer from, Integer size) {
-        if (statuses == null) {
-            statuses = new ArrayList<>();
-            statuses.add(CommentStatus.REJECTED);
-            statuses.add(CommentStatus.PUBLISHED);
-        }
-        if ((rangeStart == null) || (rangeEnd == null)) {
-            return commentRepository.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses,
-                            PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
-                    .collect(Collectors.toList());
-        }
-        return commentRepository.searchCommentByAuthorWithoutTime(userId, statuses,
+        statuses = Optional.ofNullable(statuses).orElse(List.of(CommentStatus.values()));
+        rangeStart = Optional.ofNullable(rangeStart).orElse(Timestamp.valueOf(LocalDateTime.now()));
+        rangeEnd = Optional.ofNullable(rangeEnd).orElse(Timestamp.valueOf(LocalDateTime.now().plusYears(100)));
+
+        return commentRepository.findCommentsByAuthor(userId, statuses, rangeStart, rangeEnd,
                         PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
                 .collect(Collectors.toList());
+
+
+
+//        if ((rangeStart == null) || (rangeEnd == null)) {
+//            return commentRepository.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses,
+//                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+//                    .collect(Collectors.toList());
+//        }
+//        return commentRepository.searchCommentByAuthorWithoutTime(userId, statuses,
+//                        PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
+//                .collect(Collectors.toList());
     }
 
     @Override
