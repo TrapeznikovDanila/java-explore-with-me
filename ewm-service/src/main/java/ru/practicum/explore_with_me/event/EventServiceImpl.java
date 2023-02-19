@@ -349,26 +349,16 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.makeRequestDto(requestRepository.save(request));
     }
 
+    // Сохранение комментария
     @Override
     public CommentDto saveNewComment(Long userId, Long eventId, NewCommentDto commentDto) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(null, ErrorStatus.NOT_FOUND,
+                "User was not found.", String.format("User with id=%s was not found.", userId),
+                LocalDateTime.now()));
         Comment comment = CommentMapper.makeComment(commentDto);
-        Optional<Event> eventOptional = repository.findById(eventId);
-        if (eventOptional.isPresent()) {
-            comment.setEvent(eventOptional.get());
-        } else {
-            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The event object was not found.",
-                    String.format("Event with id=%s was not found.", eventId),
-                    LocalDateTime.now());
-        }
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            comment.setUser(userOptional.get());
-            comment.setAuthorName(userOptional.get().getName());
-        } else {
-            throw new NotFoundException(null, ErrorStatus.NOT_FOUND, "The user object was not found.",
-                    String.format("User with id=%s was not found.", userId),
-                    LocalDateTime.now());
-        }
+        comment.setEvent(getEvent(eventId));
+        comment.setUser(user);
+        comment.setAuthorName(user.getName());
         comment.setCreated(Timestamp.from(Instant.now()));
         comment.setStatus(CommentStatus.PUBLISHED);
         return CommentMapper.makeCommentDto(commentRepository.save(comment));
