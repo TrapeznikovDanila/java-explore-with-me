@@ -10,6 +10,10 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.explore_with_me.client.BaseClient;
 import ru.practicum.explore_with_me.event.dto.EndpointHitDto;
 
+import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.time.Instant;
+
 @Service
 public class EventClient extends BaseClient {
 
@@ -23,7 +27,14 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> saveStats(EndpointHitDto endpointHitDto) {
+    public ResponseEntity<Object> saveStats(HttpServletRequest request) {
+        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
+                .ip(request.getRemoteAddr())
+                .uri(request.getRequestURI())
+                .app("main-service")
+                .timestamp(Timestamp.from(Instant.now()))
+                .build();
+
         return post("/hit", endpointHitDto);
     }
 }

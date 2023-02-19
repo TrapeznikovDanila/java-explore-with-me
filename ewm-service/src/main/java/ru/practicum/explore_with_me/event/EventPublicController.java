@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore_with_me.event.dto.EndpointHitDto;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.event.dto.EventPublicSearch;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
@@ -15,9 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Slf4j
 @Validated
@@ -42,33 +41,21 @@ public class EventPublicController {
                                          HttpServletRequest request) {
         EventPublicSearch eventSearch = EventPublicSearch.builder()
                 .text(text)
-                .categories((Set<Long>) categories)
+                .categories(new HashSet<>(categories))
                 .paid(paid)
                 .rangeStart(rangeStart)
                 .rangeEnd(rangeEnd)
                 .onlyAvailable(onlyAvailable)
-                .sort(sort)
+                .sort(Optional.ofNullable(sort).orElse(SortVariants.EVENT_DATE))
                 .pageable(PageRequest.of(from / size, size))
                 .build();
-        EndpointHitDto endpointHitDto = new EndpointHitDto();
-        endpointHitDto.setIp(request.getRemoteAddr());
-        endpointHitDto.setUri("/events");
-        endpointHitDto.setApp("main-service");
-        endpointHitDto.setTimestamp(Timestamp.from(Instant.now()));
-        client.saveStats(endpointHitDto);
-
+        client.saveStats(request);
         return service.getEventsFromPublicController(eventSearch);
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEventsById(@PathVariable Long id, HttpServletRequest request) {
-        EndpointHitDto endpointHitDto = new EndpointHitDto();
-        endpointHitDto.setIp(request.getRemoteAddr());
-        endpointHitDto.setUri("/events/" + id);
-        endpointHitDto.setApp("main-service");
-        endpointHitDto.setTimestamp(Timestamp.from(Instant.now()));
-        client.saveStats(endpointHitDto);
-
+        client.saveStats(request);
         return service.getEventsByIdFromPublicController(id);
     }
 }

@@ -1,11 +1,15 @@
 package ru.practicum.explore_with_me.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class EndpointHitDto {
     private String app;
     private String uri;

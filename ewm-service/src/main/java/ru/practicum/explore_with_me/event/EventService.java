@@ -18,7 +18,7 @@ public interface EventService {
     EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventRequest);
     List<EventShortDto> getEventsByInitiator(Long userId, Integer from, Integer size);
 
-    List<EventFullDto> getEvents(EventAdminSearch eventSearch);
+    List<EventFullDto> getEventsFromAdminController(EventAdminSearch eventSearch);
 
     List<EventShortDto> getEventsFromPublicController(EventPublicSearch eventSearch);
 
@@ -26,19 +26,19 @@ public interface EventService {
 
     EventFullDto rejectEvent(Long eventId);
 
-    void rejectComment(Long eventId, RejectionCommentRequest commentRequest);
+    EventFullDto rejectedEventByInitiator(Long userId, Long eventId);
 
     EventFullDto getEventsByIdFromPublicController(Long id);
 
     EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId);
 
-    EventFullDto rejectedEventByInitiator(Long userId, Long eventId);
-
-    List<ParticipationRequestDto> getRequestsByInitiator(Long userId, Long eventId);
-
     ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId);
 
     ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId);
+
+    List<ParticipationRequestDto> getRequestsByEventIdByInitiator(Long userId, Long eventId);
+
+    void rejectComment(Long eventId, RejectionCommentRequest commentRequest);
 
     CommentDto saveNewComment(Long userId, Long eventId, NewCommentDto commentDto);
 

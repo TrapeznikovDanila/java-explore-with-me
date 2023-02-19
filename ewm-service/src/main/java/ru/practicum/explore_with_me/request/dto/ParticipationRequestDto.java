@@ -1,12 +1,16 @@
 package ru.practicum.explore_with_me.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explore_with_me.request.RequestStates;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ParticipationRequestDto {
     private Long id;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")

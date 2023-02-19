@@ -1,14 +1,18 @@
 package ru.practicum.explore_with_me.compilation;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explore_with_me.event.Event;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "compilations")
-@Data
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

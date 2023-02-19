@@ -1,7 +1,7 @@
 package ru.practicum.explore_with_me.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explore_with_me.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.event.EventStates;
 import ru.practicum.explore_with_me.event.Location;
@@ -12,7 +12,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class EventFullDto {
     private String annotation;
     private CategoryDto category;

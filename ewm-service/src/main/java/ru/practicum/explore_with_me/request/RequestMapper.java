@@ -7,12 +7,11 @@ import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
 public class RequestMapper {
 
     public static ParticipationRequestDto makeRequestDto(Request request) {
-        ParticipationRequestDto requestDto = new ParticipationRequestDto();
-        requestDto.setId(request.getId());
-        requestDto.setCreated(request.getCreated());
-        requestDto.setEvent(request.getEvent().getId());
-        requestDto.setRequester(request.getRequester().getId());
-        requestDto.setStatus(request.getStatus());
-        return requestDto;
+        return ParticipationRequestDto.builder()
+                .id(request.getId())
+                .created(request.getCreated())
+                .event(request.getEvent().getId())
+                .requester(request.getRequester().getId())
+                .status(request.getStatus()).build();
     }
 }

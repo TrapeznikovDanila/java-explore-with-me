@@ -8,15 +8,13 @@ import ru.practicum.explore_with_me.category.dto.NewCategoryDto;
 public class CategoryMapper {
 
     public static Category makeCategory(NewCategoryDto categoryDto) {
-        Category category = new Category();
-        category.setName(categoryDto.getName());
-        return category;
+        return Category.builder()
+                .name(categoryDto.getName()).build();
     }
 
     public static CategoryDto makeCategoryDto(Category category) {
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setName(category.getName());
-        return categoryDto;
+        return CategoryDto.builder()
+                .id(category.getId())
+                .name(category.getName()).build();
     }
 }

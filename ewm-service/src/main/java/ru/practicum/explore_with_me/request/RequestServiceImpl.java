@@ -29,9 +29,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public ParticipationRequestDto saveNewRequest(Long userId, Long eventId) {
-        Request request = new Request();
-        request.setCreated(Timestamp.from(Instant.now()));
-        request.setStatus(RequestStates.PENDING);
+        Request request = Request.builder()
+                .created(Timestamp.from(Instant.now()))
+                .status(RequestStates.PENDING).build();
         setRequester(request, userId);
         setEvent(request, eventId);
         return RequestMapper.makeRequestDto(repository.save(request));

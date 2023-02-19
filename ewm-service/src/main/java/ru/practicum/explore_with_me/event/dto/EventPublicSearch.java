@@ -23,7 +23,7 @@ public class EventPublicSearch {
     private Timestamp rangeStart;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS")
     private Timestamp rangeEnd;
-    private Boolean onlyAvailable;
+    private boolean onlyAvailable;
     private SortVariants sort;
     private Pageable pageable;
 }

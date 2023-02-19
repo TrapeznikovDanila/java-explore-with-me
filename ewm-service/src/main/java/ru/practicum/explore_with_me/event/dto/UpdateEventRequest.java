@@ -1,11 +1,15 @@
 package ru.practicum.explore_with_me.event.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UpdateEventRequest {
     @Size(max = 2000, min = 20)
     private String annotation;

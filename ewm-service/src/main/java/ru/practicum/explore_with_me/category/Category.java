@@ -1,13 +1,17 @@
 package ru.practicum.explore_with_me.category;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "categories")
-@Data
 public class Category {
 
     @Id

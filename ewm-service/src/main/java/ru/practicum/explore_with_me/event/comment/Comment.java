@@ -1,15 +1,19 @@
 package ru.practicum.explore_with_me.event.comment;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explore_with_me.event.Event;
 import ru.practicum.explore_with_me.user.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "comments")
-@Data
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

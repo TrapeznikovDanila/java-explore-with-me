@@ -14,37 +14,36 @@ import java.util.stream.Collectors;
 public class EventMapper {
 
     public static Event makeEvent(NewEventDto eventDto) {
-        Event event = new Event();
-        event.setAnnotation(eventDto.getAnnotation());
-        event.setDescription(eventDto.getDescription());
-        event.setEventDate(eventDto.getEventDate());
-        event.setLocationLat(eventDto.getLocation().getLat());
-        event.setLocationLon(eventDto.getLocation().getLon());
-        event.setPaid(eventDto.isPaid());
-        event.setParticipantLimit(eventDto.getParticipantLimit());
-        event.setRequestModeration(eventDto.isRequestModeration());
-        event.setTitle(eventDto.getTitle());
-        return event;
+        return Event.builder()
+                .annotation(eventDto.getAnnotation())
+                .description(eventDto.getDescription())
+                .eventDate(eventDto.getEventDate())
+                .locationLat(eventDto.getLocation().getLat())
+                .locationLon(eventDto.getLocation().getLon())
+                .paid(eventDto.isPaid())
+                .participantLimit(eventDto.getParticipantLimit())
+                .requestModeration(eventDto.isRequestModeration())
+                .title(eventDto.getTitle()).build();
     }
 
     public static EventFullDto makeEventFullDto(Event event) {
-        EventFullDto eventFullDto = new EventFullDto();
-        eventFullDto.setAnnotation(event.getAnnotation());
-        eventFullDto.setCategory(CategoryMapper.makeCategoryDto(event.getCategory()));
-        eventFullDto.setConfirmedRequests(event.getConfirmedRequests());
-        eventFullDto.setCreatedOn(event.getCreatedOn());
-        eventFullDto.setDescription(event.getDescription());
-        eventFullDto.setEventDate(event.getEventDate());
-        eventFullDto.setId(event.getId());
-        eventFullDto.setInitiator(UserMapper.makeUserShortDto(event.getInitiator()));
-        eventFullDto.setLocation(new Location(event.getLocationLat(), event.getLocationLon()));
-        eventFullDto.setPaid(event.isPaid());
-        eventFullDto.setParticipantLimit(event.getParticipantLimit());
-        eventFullDto.setPublishedOn(event.getPublishedOn());
-        eventFullDto.setRequestModeration(event.isRequestModeration());
-        eventFullDto.setState(event.getState());
-        eventFullDto.setTitle(event.getTitle());
-        eventFullDto.setViews(event.getViews());
+        EventFullDto eventFullDto = EventFullDto.builder()
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.makeCategoryDto(event.getCategory()))
+                .createdOn(event.getCreatedOn())
+                .description(event.getDescription())
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .initiator(UserMapper.makeUserShortDto(event.getInitiator()))
+                .location(new Location(event.getLocationLat(), event.getLocationLon()))
+                .paid(event.isPaid())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn())
+                .requestModeration(event.isRequestModeration())
+                .state(event.getState())
+                .title(event.getTitle())
+                .views(event.getViews())
+                .build();
         if (event.getComments() != null) {
             eventFullDto.setComments(event.getComments().stream()
                     .map(CommentMapper::makeCommentDto).collect(Collectors.toList()));
@@ -58,7 +57,6 @@ public class EventMapper {
         EventShortDto eventShortDto = new EventShortDto();
         eventShortDto.setAnnotation(event.getAnnotation());
         eventShortDto.setCategory(CategoryMapper.makeCategoryDto(event.getCategory()));
-        eventShortDto.setConfirmedRequests(event.getConfirmedRequests());
         eventShortDto.setEventDate(event.getEventDate());
         eventShortDto.setId(event.getId());
         eventShortDto.setInitiator(UserMapper.makeUserShortDto(event.getInitiator()));

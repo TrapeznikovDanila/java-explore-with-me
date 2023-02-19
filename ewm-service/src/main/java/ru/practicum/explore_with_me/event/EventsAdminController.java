@@ -46,7 +46,7 @@ public class EventsAdminController {
                 .rangeEnd(rangeEnd)
                 .pageable(PageRequest.of(from / size, size, Sort.by("id")))
                 .build();
-        return service.getEvents(eventSearch);
+        return service.getEventsFromAdminController(eventSearch);
     }
 
     @PatchMapping("/{eventId}/publish")

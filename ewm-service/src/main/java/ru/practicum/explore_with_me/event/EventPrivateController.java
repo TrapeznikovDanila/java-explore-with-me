@@ -23,70 +23,70 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/users/{userId}")
 @RequiredArgsConstructor
 public class EventPrivateController {
 
     private final EventService service;
 
-    @PostMapping("/{userId}/events")
+    @PostMapping("/events")
     public EventFullDto saveNewEvent(@RequestBody @Validated NewEventDto eventDto, @PathVariable Long userId) {
         return service.saveNewEvent(userId, eventDto);
     }
 
-    @GetMapping("/{userId}/events")
+    @GetMapping("/events")
     public List<EventShortDto> getEvents(@PathVariable Long userId,
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return service.getEventsByInitiator(userId, from, size);
     }
 
-    @GetMapping("/{userId}/events/{eventId}")
+    @GetMapping("/events/{eventId}")
     public EventFullDto getEventsById(@PathVariable Long userId, @PathVariable Long eventId) {
         return service.getEventsByIdFromPrivateController(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events")
+    @PatchMapping("/events")
     public EventFullDto updateEvent(@PathVariable Long userId,
                                     @RequestBody @Validated UpdateEventRequest updateEvent) {
         return service.updateEventByInitiator(userId, updateEvent);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}")
+    @PatchMapping("/events/{eventId}")
     public EventFullDto rejectedEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         return service.rejectedEventByInitiator(userId, eventId);
     }
 
-    @GetMapping("/{userId}/events/{eventId}/requests")
+    @GetMapping("/events/{eventId}/requests")
     public List<ParticipationRequestDto> getRequestsByInitiator(@PathVariable Long userId, @PathVariable Long eventId) {
-        return service.getRequestsByInitiator(userId, eventId);
+        return service.getRequestsByEventIdByInitiator(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
+    @PatchMapping("/events/{eventId}/requests/{reqId}/confirm")
     public ParticipationRequestDto confirmRequest(@PathVariable Long userId, @PathVariable Long eventId,
                                                   @PathVariable Long reqId) {
         return service.confirmRequest(userId, eventId, reqId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
+    @PatchMapping("/events/{eventId}/requests/{reqId}/reject")
     public ParticipationRequestDto rejectRequest(@PathVariable Long userId, @PathVariable Long eventId,
                                                  @PathVariable Long reqId) {
         return service.rejectRequest(userId, eventId, reqId);
     }
 
-    @PostMapping("/{userId}/events/{eventId}/comment")
+    @PostMapping("/events/{eventId}/comment")
     public CommentDto saveNewComment(@PathVariable Long userId, @PathVariable Long eventId,
                                      @RequestBody @Valid NewCommentDto commentDto) {
         return service.saveNewComment(userId, eventId, commentDto);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/comment")
+    @PatchMapping("/events/{eventId}/comment")
     public CommentDto updateComment(@PathVariable Long userId, @PathVariable Long eventId,
                                            @RequestBody @Validated UpdateCommentRequest updateCommentRequest) {
         return service.updateComment(userId, eventId, updateCommentRequest);
     }
 
-    @GetMapping("/{userId}/comments")
+    @GetMapping("/comments")
     public List<CommentDto> searchCommentByAuthor(@PathVariable Long userId,
                                                   @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeStart,
                                                   @RequestParam(required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:SS") Timestamp rangeEnd,
