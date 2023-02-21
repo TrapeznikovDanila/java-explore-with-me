@@ -1,13 +1,17 @@
 package ru.practicum.explore_with_me.category.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class CategoryDto {
     @NotNull
-    private long id;
+    private Long id;
     @NotNull
     private String name;
 }

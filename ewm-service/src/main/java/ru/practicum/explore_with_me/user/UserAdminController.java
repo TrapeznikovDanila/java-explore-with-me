@@ -33,7 +33,7 @@ public class UserAdminController {
     }
 
     @DeleteMapping("{userId}")
-    public void deleteUser(@PathVariable int userId) {
+    public void deleteUser(@PathVariable Long userId) {
         service.deleteUser(userId);
     }
 }

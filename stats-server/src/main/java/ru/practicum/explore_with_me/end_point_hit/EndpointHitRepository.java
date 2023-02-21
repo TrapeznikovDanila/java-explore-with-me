@@ -8,12 +8,16 @@ import java.util.List;
 
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
-    @Query("select distinct (e.ip) from EndpointHit e where e.uri in :uris and e.timestamp between :start " +
-            "and :end")
+    @Query("SELECT DISTINCT (e.ip) " +
+            "FROM EndpointHit e " +
+            "WHERE e.uri IN :uris " +
+            "AND e.timestamp BETWEEN :start AND :end")
     List<EndpointHit> findAllIpUnique(Timestamp start, Timestamp end, List<String> uris);
 
-    @Query("select e from EndpointHit e where e.uri in :uris and e.timestamp between :start " +
-            "and :end")
+    @Query("SELECT e " +
+            "FROM EndpointHit e " +
+            "WHERE e.uri IN :uris " +
+            "AND e.timestamp BETWEEN :start AND :end")
     List<EndpointHit> findAll(Timestamp start, Timestamp end, List<String> uris);
 
 }

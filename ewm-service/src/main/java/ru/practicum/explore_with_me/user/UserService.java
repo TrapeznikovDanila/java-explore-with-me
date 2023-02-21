@@ -10,6 +10,6 @@ public interface UserService {
 
     List<UserDto> getUsers(Long[] ids, int from, int size);
 
-    void deleteUser(long userId);
+    void deleteUser(Long userId);
 
 }

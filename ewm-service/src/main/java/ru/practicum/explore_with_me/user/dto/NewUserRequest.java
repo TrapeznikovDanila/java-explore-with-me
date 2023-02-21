@@ -1,11 +1,14 @@
 package ru.practicum.explore_with_me.user.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewUserRequest {
     @NotNull
     @Email

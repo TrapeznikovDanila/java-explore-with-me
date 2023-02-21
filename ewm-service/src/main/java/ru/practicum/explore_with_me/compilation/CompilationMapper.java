@@ -11,19 +11,17 @@ import java.util.stream.Collectors;
 public class CompilationMapper {
 
     public static Compilation makeCompilation(NewCompilationDto compilationDto) {
-        Compilation compilation = new Compilation();
-        compilation.setPinned(compilationDto.isPinned());
-        compilation.setTitle(compilationDto.getTitle());
-        return compilation;
+        return Compilation.builder()
+                .pinned(compilationDto.isPinned())
+                .title(compilationDto.getTitle()).build();
     }
 
     public static CompilationDto makeCompilationDto(Compilation compilation) {
-        CompilationDto compilationDto = new CompilationDto();
-        compilationDto.setId(compilation.getId());
-        compilationDto.setEvents(compilation.getEvents().stream().map(EventMapper::makeEventShortDto)
-                .collect(Collectors.toList()));
-        compilationDto.setPinned(compilation.isPinned());
-        compilationDto.setTitle(compilation.getTitle());
-        return compilationDto;
+        return CompilationDto.builder()
+                .id(compilation.getId())
+                .events(compilation.getEvents().stream().map(EventMapper::makeEventShortDto)
+                        .collect(Collectors.toList()))
+                .pinned(compilation.isPinned())
+                .title(compilation.getTitle()).build();
     }
 }

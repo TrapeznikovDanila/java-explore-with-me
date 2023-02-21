@@ -1,5 +1,10 @@
 package ru.practicum.explore_with_me.event;
 
+import ru.practicum.explore_with_me.event.comment.CommentStatus;
+import ru.practicum.explore_with_me.event.comment.dto.CommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.NewCommentDto;
+import ru.practicum.explore_with_me.event.comment.dto.RejectionCommentRequest;
+import ru.practicum.explore_with_me.event.comment.dto.UpdateCommentRequest;
 import ru.practicum.explore_with_me.event.dto.*;
 import ru.practicum.explore_with_me.request.dto.ParticipationRequestDto;
 
@@ -7,34 +12,41 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface EventService {
-    EventFullDto saveNewEvent(long userId, NewEventDto eventDto);
+    EventFullDto saveNewEvent(Long userId, NewEventDto eventDto);
+    EventFullDto updateEventByInitiator(Long userId, UpdateEventRequest updateEventRequest);
 
-    List<EventFullDto> getEvents(List<Long> users, List<EventStates> states, List<Long> categories, Timestamp rangeStart,
-                                 Timestamp rangeEnd, Integer from, Integer size);
+    EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventRequest);
+    List<EventShortDto> getEventsByInitiator(Long userId, Integer from, Integer size);
 
-    List<EventShortDto> getEventsFromPublicController(String text, List<Long> categories, Boolean paid, Timestamp rangeStart,
-                                                             Timestamp rangeEnd, Boolean onlyAvailable, SortVariants sort, Integer from,
-                                                             Integer size);
+    List<EventFullDto> getEventsFromAdminController(EventAdminSearch eventSearch);
 
-    List<EventShortDto> getEventsByInitiator(long userId, Integer from, Integer size);
+    List<EventShortDto> getEventsFromPublicController(EventPublicSearch eventSearch);
 
-    EventFullDto publishEvent(long eventId);
+    EventFullDto publishEvent(Long eventId);
 
-    EventFullDto rejectEvent(long eventId);
+    EventFullDto rejectEvent(Long eventId);
 
-    EventFullDto getEventsByIdFromPublicController(long id);
+    EventFullDto rejectedEventByInitiator(Long userId, Long eventId);
 
-    EventFullDto getEventsByIdFromPrivateController(long userId, long eventId);
+    EventFullDto getEventsByIdFromPublicController(Long id);
 
-    EventFullDto updateEventByInitiator(long userId, UpdateEventRequest updateEventRequest);
+    EventFullDto getEventsByIdFromPrivateController(Long userId, Long eventId);
 
-    EventFullDto updateEventByAdmin(long eventId, AdminUpdateEventRequest updateEventRequest);
+    ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId);
 
-    EventFullDto rejectedEventByInitiator(long userId, long eventId);
+    ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId);
 
-    List<ParticipationRequestDto> getRequestsByInitiator(long userId, long eventId);
+    List<ParticipationRequestDto> getRequestsByEventIdByInitiator(Long userId, Long eventId);
 
-    ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId);
+    void rejectComment(Long eventId, RejectionCommentRequest commentRequest);
 
-    ParticipationRequestDto rejectRequest(long userId, long eventId, long reqId);
+    CommentDto saveNewComment(Long userId, Long eventId, NewCommentDto commentDto);
+
+    CommentDto updateComment(Long userId, Long eventId, UpdateCommentRequest updateCommentRequest);
+
+    List<CommentDto> searchCommentByAuthor(Long userId, Timestamp rangeStart, Timestamp rangeEnd, List<CommentStatus> statuses,
+                          Integer from, Integer size);
+
+    List<CommentDto> getComments(List<Long> users, List<Long> events, List<CommentStatus> statuses, Timestamp rangeStart, Timestamp rangeEnd,
+                                 Integer from, Integer size);
 }

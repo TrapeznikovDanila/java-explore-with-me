@@ -10,15 +10,15 @@ public interface CompilationService {
 
     CompilationDto saveNewCompilation(NewCompilationDto compilationDto);
 
-    CompilationDto getCompilationByIdFromPublicController(long compId);
+    CompilationDto getCompilationByIdFromPublicController(Long compId);
 
-    void deleteCompilation(long compId);
+    void deleteCompilation(Long compId);
 
-    void deleteEventFromCompilation(long compId, long eventId);
+    void deleteEventFromCompilation(Long compId, Long eventId);
 
-    void addEventToCollection(long compId, long eventId);
+    void addEventToCollection(Long compId, Long eventId);
 
-    void unpinnedCompilation(long compId);
+    void unpinnedCompilation(Long compId);
 
-    void pinnedCompilation(long compId);
+    void pinnedCompilation(Long compId);
 }

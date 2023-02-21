@@ -1,11 +1,10 @@
-package ru.practicum.explore_with_me.request;
+package ru.practicum.explore_with_me.event.comment;
 
 import lombok.*;
 import ru.practicum.explore_with_me.event.Event;
 import ru.practicum.explore_with_me.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 @Getter
@@ -14,19 +13,22 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "requests")
-public class Request {
+@Table(name = "comments")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    private Timestamp created;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    private String authorName;
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User requester;
+    private String text;
+    private Timestamp created;
+    private Timestamp updated;
     @Enumerated(EnumType.STRING)
-    private RequestStates status;
+    private CommentStatus status;
+    private String rejectionReason;
 }

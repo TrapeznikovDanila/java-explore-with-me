@@ -35,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto getCategoryById(long catId) {
+    public CategoryDto getCategoryById(Long catId) {
         Optional<Category> categoryOptional = repository.findById(catId);
         if (categoryOptional.isPresent()) {
             Category category = categoryOptional.get();
@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(long catId) {
+    public void deleteCategory(Long catId) {
         repository.deleteById(catId);
     }
 }

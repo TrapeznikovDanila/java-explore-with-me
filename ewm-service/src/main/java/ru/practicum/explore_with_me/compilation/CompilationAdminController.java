@@ -22,27 +22,27 @@ public class CompilationAdminController {
     }
 
     @DeleteMapping("/{compId}")
-    public void deleteCompilation(@PathVariable long compId) {
+    public void deleteCompilation(@PathVariable Long compId) {
         service.deleteCompilation(compId);
     }
 
     @DeleteMapping("/{compId}/events/{eventId}")
-    public void deleteEventFromCompilation(@PathVariable long compId, @PathVariable long eventId) {
+    public void deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId) {
         service.deleteEventFromCompilation(compId, eventId);
     }
 
     @PatchMapping("/{compId}/events/{eventId}")
-    public void addEventToCollection(@PathVariable long compId, @PathVariable long eventId) {
+    public void addEventToCollection(@PathVariable Long compId, @PathVariable Long eventId) {
         service.addEventToCollection(compId, eventId);
     }
 
     @DeleteMapping("/{compId}/pin")
-    public void unpinnedCompilation(@PathVariable long compId) {
+    public void unpinnedCompilation(@PathVariable Long compId) {
         service.unpinnedCompilation(compId);
     }
 
     @PatchMapping("/{compId}/pin")
-    public void pinnedCompilation(@PathVariable long compId) {
+    public void pinnedCompilation(@PathVariable Long compId) {
         service.pinnedCompilation(compId);
     }
 }

@@ -9,24 +9,21 @@ import ru.practicum.explore_with_me.user.dto.UserShortDto;
 public class UserMapper {
 
     public static User makeUser(NewUserRequest userRequest) {
-        User user = new User();
-        user.setEmail(userRequest.getEmail());
-        user.setName(userRequest.getName());
-        return user;
+        return User.builder()
+                .email(userRequest.getEmail())
+                .name(userRequest.getName()).build();
     }
 
     public static UserDto makeUserDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setEmail(user.getEmail());
-        return userDto;
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail()).build();
     }
 
     public static UserShortDto makeUserShortDto(User user) {
-        UserShortDto userDto = new UserShortDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        return userDto;
+        return UserShortDto.builder()
+                .id(user.getId())
+                .name(user.getName()).build();
     }
 }

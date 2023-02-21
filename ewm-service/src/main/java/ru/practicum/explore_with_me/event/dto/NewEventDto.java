@@ -1,14 +1,17 @@
 package ru.practicum.explore_with_me.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.explore_with_me.event.Location;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class NewEventDto {
     @NotNull
     @Size(max = 2000, min = 20)
@@ -24,7 +27,7 @@ public class NewEventDto {
     @NotNull
     private Location location;
     private boolean paid;
-    private Integer participantLimit;
+    private int participantLimit;
     private boolean requestModeration;
     @NotNull
     @Size(max = 120, min = 3)

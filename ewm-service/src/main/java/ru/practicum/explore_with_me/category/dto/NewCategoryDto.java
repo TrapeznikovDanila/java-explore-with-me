@@ -1,10 +1,13 @@
 package ru.practicum.explore_with_me.category.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewCategoryDto {
     @NotNull
     private String name;
