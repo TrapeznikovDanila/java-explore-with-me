@@ -44,4 +44,6 @@ public class Event {
     private long views;
     @Transient
     private List<Comment> comments;
+    @Transient
+    private int confirmedRequests;
 }

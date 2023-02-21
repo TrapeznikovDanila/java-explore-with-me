@@ -6,8 +6,10 @@ import ru.practicum.explore_with_me.event.comment.CommentMapper;
 import ru.practicum.explore_with_me.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.event.dto.NewEventDto;
+import ru.practicum.explore_with_me.request.RequestStates;
 import ru.practicum.explore_with_me.user.UserMapper;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -50,19 +52,27 @@ public class EventMapper {
         } else {
             eventFullDto.setComments(null);
         }
+        if (event.getRequests() != null) {
+            eventFullDto.setConfirmedRequests((int) event.getRequests()
+                    .stream().filter(r -> r.getStatus().equals(RequestStates.CONFIRMED)).count());
+        }
         return eventFullDto;
     }
 
     public static EventShortDto makeEventShortDto(Event event) {
-        EventShortDto eventShortDto = new EventShortDto();
-        eventShortDto.setAnnotation(event.getAnnotation());
-        eventShortDto.setCategory(CategoryMapper.makeCategoryDto(event.getCategory()));
-        eventShortDto.setEventDate(event.getEventDate());
-        eventShortDto.setId(event.getId());
-        eventShortDto.setInitiator(UserMapper.makeUserShortDto(event.getInitiator()));
-        eventShortDto.setPaid(event.isPaid());
-        eventShortDto.setTitle(event.getTitle());
-        eventShortDto.setViews(event.getViews());
+        EventShortDto eventShortDto = EventShortDto.builder()
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.makeCategoryDto(event.getCategory()))
+                .eventDate(event.getEventDate())
+                .id(event.getId())
+                .initiator(UserMapper.makeUserShortDto(event.getInitiator()))
+                .paid(event.isPaid())
+                .title(event.getTitle())
+                .views(event.getViews()).build();
+        if (event.getRequests() != null) {
+            eventShortDto.setConfirmedRequests((int) event.getRequests()
+                    .stream().filter(r -> r.getStatus().equals(RequestStates.CONFIRMED)).count());
+        }
         return eventShortDto;
     }
 }

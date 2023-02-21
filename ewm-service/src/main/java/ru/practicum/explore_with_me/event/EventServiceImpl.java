@@ -236,7 +236,7 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException(null, ErrorStatus.CONFLICT, "Request moderation is not required.",
                     String.format("For event with id=%s request moderation is not required.", event.getId()),
                     LocalDateTime.now());
-        } else if (event.getParticipantLimit() == setConfirmedRequests(event)) {
+        } else if (event.getParticipantLimit() == getConfirmedRequests(event)) {
             throw new ValidationException(null, ErrorStatus.CONFLICT, "Requests limit has been reached.",
                     String.format("For event with id=%s request limit has been reached.", event.getId()),
                     LocalDateTime.now());
@@ -393,17 +393,6 @@ public class EventServiceImpl implements EventService {
         return commentRepository.findCommentsByAuthor(userId, statuses, rangeStart, rangeEnd,
                         PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
                 .collect(Collectors.toList());
-
-
-
-//        if ((rangeStart == null) || (rangeEnd == null)) {
-//            return commentRepository.searchCommentByAuthor(userId, rangeStart, rangeEnd, statuses,
-//                    PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
-//                    .collect(Collectors.toList());
-//        }
-//        return commentRepository.searchCommentByAuthorWithoutTime(userId, statuses,
-//                        PageRequest.of(from / size, size)).stream().map(CommentMapper::makeCommentDto)
-//                .collect(Collectors.toList());
     }
 
     @Override
@@ -435,10 +424,12 @@ public class EventServiceImpl implements EventService {
     }
 
     private void checkOtherRequests(Event event) {
-        if (event.getParticipantLimit() == setConfirmedRequests(event)) {
+        if (event.getParticipantLimit() == getConfirmedRequests(event)) {
             List<Request> requests = requestRepository.findAllByEvent_Id(event.getId());
             for (Request r : requests) {
-                r.setStatus(RequestStates.REJECTED);
+                if (!Objects.equals(r.getStatus(), RequestStates.CONFIRMED)) {
+                    r.setStatus(RequestStates.REJECTED);
+                }
             }
             requestRepository.saveAll(requests);
         }
@@ -461,7 +452,7 @@ public class EventServiceImpl implements EventService {
         return eventFullDtos;
     }
 
-    private int setConfirmedRequests(Event event) {
+    private int getConfirmedRequests(Event event) {
         return (int) event.getRequests()
                 .stream()
                 .filter(r -> r.getStatus().equals(RequestStates.CONFIRMED))
