@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   stats-server:
-    build: stats-server
+    build: stats_server
     image: stats
     container_name: explore-with-me-stats
     depends_on:
@@ -23,7 +23,7 @@ services:
       - POSTGRES_PASSWORD=root
 
   ewm-service:
-    build: ewm-service
+    build: ewm_service
     image: ewm
     container_name: explore-with-me-ewm
     ports:
